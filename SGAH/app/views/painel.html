@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% from '_icones.html' import icone %}
+
+{# barras horizontais: recebe uma lista de (nome, total) #}
+{% macro barras(lista) %}
+    {% set maior = lista[0][1] or 1 %}
+    <div class="barras">
+        {% for nome, total in lista %}
+        <div>
+            <div class="barra-topo">
+                <span title="{{ nome }}">{{ nome }}</span>
+                <strong>{{ total }}</strong>
+            </div>
+            <div class="barra-trilho">
+                <div class="barra-preenchida" style="width: {{ (total / maior * 100)|round(1) }}%"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% block titulo %}Visão geral{% endblock %}
+
+{% block content %}
+{% set novo_por_aqui = not (resumo.abrigos or resumo.tipos_suprimentos or resumo.operacoes) %}
+<section class="hero">
+    <div class="hero-texto">
+        <small>Painel operacional</small>
+        <h1>Olá, {{ g.usuario.nome.split()[0] }}</h1>
+        <p>
+            {% if resumo.urgentes or resumo.estoque_baixo %}
+                Hoje pedem atenção
+                {% if resumo.urgentes %}<strong>{{ resumo.urgentes }} ocorrência{{ 's' if resumo.urgentes != 1 }} urgente{{ 's' if resumo.urgentes != 1 }}</strong>{% endif %}
+                {% if resumo.urgentes and resumo.estoque_baixo %} e {% endif %}
+                {% if resumo.estoque_baixo %}<strong>{{ resumo.estoque_baixo }} {{ 'itens' if resumo.estoque_baixo != 1 else 'item' }} com estoque baixo</strong>{% endif %}.
+            {% elif not novo_por_aqui %}
+                Tudo em ordem por aqui, nenhuma urgência no momento.
+            {% else %}
+                Aqui você organiza abrigos, estoque e ocorrências. Siga os 3 passos abaixo para começar.
+            {% endif %}
+        </p>
+        <div class="hero-botoes">
+            {% if novo_por_aqui %}
+            <a class="btn btn-branco" href="{{ url_for('abrigos.listar') }}?novo=1">{{ icone('mais') }} Cadastrar primeiro abrigo</a>
+            {% else %}
+            <a class="btn btn-branco" href="{{ url_for('operacoes.listar') }}?novo=1">{{ icone('mais') }} Nova ocorrência</a>
+            <a class="btn btn-claro" href="{{ url_for('suprimentos.listar') }}?novo=1">Dar entrada no estoque</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="hero-arte" aria-hidden="true">{{ icone('cobertura') }}</div>
+</section>
+
+{% if novo_por_aqui %}
+<section class="passos">
+    <article class="card passo">
+        <span class="passo-num">1</span>
+        <h3>Cadastre um abrigo</h3>
+        <p>O local onde as pessoas ficam acolhidas: nome, endereço, quantas pessoas cabem e quem cuida dele.</p>
+        <a class="btn btn-primary" href="{{ url_for('abrigos.listar') }}?novo=1">Cadastrar abrigo</a>
+    </article>
+    <article class="card passo">
+        <span class="passo-num">2</span>
+        <h3>Registre os suprimentos</h3>
+        <p>Água, comida, higiene, remédios. Cada item fica ligado a um abrigo, e o sistema avisa quando o estoque está acabando.</p>
+        <a class="btn btn-ghost" href="{{ url_for('suprimentos.listar') }}?novo=1">Dar entrada no estoque</a>
+    </article>
+    <article class="card passo">
+        <span class="passo-num">3</span>
+        <h3>Anote as ocorrências</h3>
+        <p>Algo urgente em campo? Registre o que está faltando e a prioridade, de baixa a crítica, para a equipe agir primeiro no que importa.</p>
+        <a class="btn btn-ghost" href="{{ url_for('operacoes.listar') }}?novo=1">Registrar ocorrência</a>
+    </article>
+</section>
+{% else %}
+<section class="kpis">
+    <article class="card kpi">
+        <div class="kpi-topo"><span class="kpi-icone azul">{{ icone('suprimentos') }}</span> Unidades em estoque</div>
+        <p class="kpi-valor">{{ resumo.itens_estoque }}</p>
+        <p class="kpi-sub">{{ resumo.tipos_suprimentos }} tipo{{ 's' if resumo.tipos_suprimentos != 1 }} de suprimento</p>
+    </article>
+
+    <article class="card kpi">
+        <div class="kpi-topo"><span class="kpi-icone verde">{{ icone('abrigos') }}</span> Abrigos</div>
+        <p class="kpi-valor">{{ resumo.abrigos }}</p>
+        <p class="kpi-sub">
+            {% if resumo.capacidade_abrigos %}Cabem {{ resumo.capacidade_abrigos }} pessoas · {{ resumo.cobertura|string|replace('.', ',') }} un. por pessoa
+            {% else %}Nenhum abrigo cadastrado{% endif %}
+        </p>
+    </article>
+
+    <article class="card kpi">
+        <div class="kpi-topo"><span class="kpi-icone laranja">{{ icone('operacoes') }}</span> Ocorrências</div>
+        <p class="kpi-valor">{{ resumo.operacoes }}</p>
+        <p class="kpi-sub">
+            {% if resumo.urgentes %}<span class="alerta">{{ resumo.urgentes }} urgente{{ 's' if resumo.urgentes != 1 }}</span> (alta ou crítica)
+            {% else %}Nenhuma urgente{% endif %}
+        </p>
+    </article>
+</section>
+
+<section class="graficos">
+    <article class="card card-corpo">
+        <h2 class="card-titulo">Ocorrências por prioridade</h2>
+        <p class="card-sub">Como estão distribuídos os registros em campo</p>
+        <div class="rosca-area">
+            <div class="rosca {% if not gradiente %}vazia{% endif %}" {% if gradiente %}style="background: {{ gradiente }}"{% endif %}>
+                <div class="rosca-centro">
+                    <strong>{{ total_ocorrencias }}</strong>
+                    <small>{{ 'registro' if total_ocorrencias == 1 else 'registros' }}</small>
+                </div>
+            </div>
+            <ul class="legenda">
+                {% for item in legenda %}
+                <li><i style="background: {{ item.cor }}"></i><span>{{ item.nome }}</span><strong>{{ item.qtd }}</strong></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </article>
+
+    <article class="card card-corpo">
+        <h2 class="card-titulo">Estoque por categoria</h2>
+        <p class="card-sub">Unidades disponíveis em cada tipo</p>
+        {% if por_categoria %}
+            {{ barras(por_categoria) }}
+        {% else %}
+            <p class="grafico-vazio">Cadastre suprimentos para ver o gráfico.</p>
+        {% endif %}
+    </article>
+</section>
+
+<section class="card atencao">
+    {% if baixos or urgentes %}
+    <div>
+        <h3>{{ icone('alerta') }} Estoque baixo</h3>
+        {% for s in baixos %}
+        <a class="item-atencao" href="{{ url_for('suprimentos.editar', id=s.id) }}">
+            <span class="item-nome">{{ s.nome }}<span class="item-meta">{{ s.abrigo_nome or s.categoria }}</span></span>
+            <span class="chip">{{ s.quantidade }} un.</span>
+        </a>
+        {% else %}
+        <p class="tudo-certo">{{ icone('ok') }} Nenhum item acabando</p>
+        {% endfor %}
+    </div>
+    <div>
+        <h3>{{ icone('operacoes') }} Ocorrências urgentes</h3>
+        {% for o in urgentes %}
+        {% set slug = o.prioridade|lower|replace('í', 'i')|replace('é', 'e') %}
+        <a class="item-atencao" href="{{ url_for('operacoes.editar', id=o.id) }}">
+            <span class="item-nome">{{ o.titulo }}<span class="item-meta">{{ o.local }}</span></span>
+            <span class="badge badge-{{ slug }}">{{ o.prioridade }}</span>
+        </a>
+        {% else %}
+        <p class="tudo-certo">{{ icone('ok') }} Nenhuma ocorrência urgente</p>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="atencao-ok">
+        <p class="tudo-certo" style="justify-content:center">{{ icone('ok') }} Nada pedindo atenção agora</p>
+        <p class="card-sub">Itens com estoque baixo e ocorrências urgentes aparecem aqui.</p>
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+{% endblock %}

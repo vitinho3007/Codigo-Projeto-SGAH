@@ -1,0 +1,48 @@
+{# formulário usado tanto para cadastrar quanto para editar (item vazio = cadastro) #}
+{% from '_icones.html' import icone %}
+{% set categorias_padrao = ['Alimentos', 'Bebidas', 'Higiene', 'Saúde', 'Roupas e abrigo', 'Ferramentas'] %}
+
+<form method="POST" action="{{ acao }}" class="form">
+    <label>Nome do suprimento
+        <input type="text" name="nome" value="{{ item.nome if item else '' }}"
+               placeholder="Ex.: Água potável (garrafão 20L)" maxlength="100" required>
+    </label>
+
+    <label>Categoria
+        <input type="text" name="categoria" list="lista-categorias" autocomplete="off"
+               value="{{ item.categoria if item else '' }}"
+               placeholder="Escolha uma sugestão ou digite" maxlength="60" required>
+        <datalist id="lista-categorias">
+            {% for c in categorias_padrao %}<option value="{{ c }}">{% endfor %}
+            {% for c in categorias if c not in categorias_padrao %}<option value="{{ c }}">{% endfor %}
+        </datalist>
+    </label>
+
+    <div class="linha-2">
+        <div class="campo">
+            <label for="quantidade">Quantidade</label>
+            <div class="stepper">
+                <button type="button" data-passo="-10" aria-label="Diminuir 10">−</button>
+                <input type="number" id="quantidade" name="quantidade" min="0" step="1"
+                       value="{{ item.quantidade if item else '' }}" placeholder="0" required>
+                <button type="button" data-passo="10" aria-label="Aumentar 10">+</button>
+            </div>
+            <small class="dica">Abaixo de 30 unidades aparece como estoque baixo.</small>
+        </div>
+
+        <label>Abrigo (opcional)
+            <select name="abrigo_id">
+                <option value="">Sem abrigo</option>
+                {% for a in abrigos %}
+                <option value="{{ a.id }}" {% if item and item.abrigo_id and a.id == item.abrigo_id|int %}selected{% endif %}>{{ a.nome }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+
+    <div class="rodape-form">
+        {% if fechar %}<button type="button" class="btn btn-ghost" data-fechar>Cancelar</button>{% endif %}
+        {% if cancelar %}<a class="btn btn-ghost" href="{{ cancelar }}">Cancelar</a>{% endif %}
+        <button class="btn btn-primary" type="submit">{{ botao }}</button>
+    </div>
+</form>

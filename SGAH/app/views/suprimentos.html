@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% from '_icones.html' import icone %}
+
+{% block titulo %}Suprimentos{% endblock %}
+
+{% block content %}
+<header class="page-head">
+    <div>
+        <p class="eyebrow">Controle de estoque</p>
+        <h1>Suprimentos</h1>
+        <p class="lead">O que você tem guardado e onde está.</p>
+    </div>
+    <button type="button" class="btn btn-primary" data-abrir-modal="modal-novo">{{ icone('mais') }} Novo suprimento</button>
+</header>
+
+<form method="GET" action="{{ url_for('suprimentos.listar') }}" class="toolbar" data-auto>
+    <div class="busca-campo">
+        {{ icone('busca') }}
+        <input type="text" name="busca" value="{{ busca }}" placeholder="Buscar por nome ou categoria">
+    </div>
+    <select name="categoria">
+        <option value="">Todas as categorias</option>
+        {% for c in categorias %}
+        <option value="{{ c }}" {% if c == categoria %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+    </select>
+    <select name="abrigo">
+        <option value="0">Todos os abrigos</option>
+        {% for a in abrigos %}
+        <option value="{{ a.id }}" {% if a.id == abrigo_filtro %}selected{% endif %}>{{ a.nome }}</option>
+        {% endfor %}
+    </select>
+    {% if busca or categoria or abrigo_filtro %}
+    <a href="{{ url_for('suprimentos.listar') }}" class="limpar">Limpar filtros</a>
+    {% endif %}
+</form>
+
+<section class="card">
+    {% if suprimentos %}
+    <div class="tabela-area">
+        <table class="tabela">
+            <thead>
+                <tr><th>Suprimento</th><th>Categoria</th><th>Quantidade</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for s in suprimentos %}
+                <tr>
+                    <td>
+                        <span class="nome">{{ s.nome }}</span>
+                        <span class="sub">{{ s.abrigo_nome or 'Sem abrigo' }}</span>
+                    </td>
+                    <td><span class="chip">{{ s.categoria }}</span></td>
+                    <td class="num">
+                        {{ s.quantidade }}
+                        {% if s.quantidade <= 30 %}<span class="tag-baixo">Baixo</span>{% endif %}
+                    </td>
+                    <td>
+                        <div class="acoes">
+                            <a class="btn-icone" href="{{ url_for('suprimentos.editar', id=s.id) }}" title="Editar" aria-label="Editar {{ s.nome }}">{{ icone('editar') }}</a>
+                            <form method="POST" action="{{ url_for('suprimentos.excluir', id=s.id) }}"
+                                  onsubmit="return confirm('Excluir este suprimento?')">
+                                <button type="submit" class="btn-icone perigo" title="Excluir" aria-label="Excluir {{ s.nome }}">{{ icone('lixeira') }}</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="tabela-rodape">{{ suprimentos|length }} {{ 'itens' if suprimentos|length != 1 else 'item' }}</p>
+    {% else %}
+    <div class="vazio">
+        <span class="vazio-icone">{{ icone('suprimentos') }}</span>
+        {% if busca or categoria or abrigo_filtro %}
+        <strong>Nada encontrado</strong>
+        <p>Nenhum suprimento bate com esses filtros.</p>
+        {% else %}
+        <strong>Seu estoque está vazio</strong>
+        <p>Cadastre o primeiro suprimento para começar a acompanhar o que você tem.</p>
+        <button type="button" class="btn btn-primary" data-abrir-modal="modal-novo">{{ icone('mais') }} Novo suprimento</button>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+
+<dialog class="modal" id="modal-novo" {% if abrir_modal %}data-abrir{% endif %}>
+    <div class="modal-topo">
+        <div>
+            <h2>Novo suprimento</h2>
+            <p>Dê entrada de um item no estoque.</p>
+        </div>
+        <button type="button" class="btn-icone" data-fechar aria-label="Fechar">{{ icone('fechar') }}</button>
+    </div>
+    <div class="modal-corpo">
+        {% if erros %}
+        <ul class="erros">{% for e in erros %}<li>{{ e }}</li>{% endfor %}</ul>
+        {% endif %}
+        {% with item=(item if abrir_modal else none), acao=url_for('suprimentos.cadastrar'), botao='Salvar suprimento', cancelar=none, fechar=true %}
+            {% include '_form_suprimento.html' %}
+        {% endwith %}
+    </div>
+</dialog>
+{% endblock %}

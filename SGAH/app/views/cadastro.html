@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% from '_icones.html' import icone %}
+
+{% block titulo %}Criar conta{% endblock %}
+
+{% block content %}
+<main class="auth">
+    <section class="auth-info">
+        <span class="marca-logo">{{ icone('cobertura') }}</span>
+        <h1>Crie seu acesso em um minuto.</h1>
+        <p>Depois é só cadastrar seus abrigos e começar a controlar o estoque e as ocorrências.</p>
+        <ul class="auth-lista">
+            <li>{{ icone('abrigos') }} Cadastre seus abrigos</li>
+            <li>{{ icone('suprimentos') }} Controle o estoque</li>
+            <li>{{ icone('operacoes') }} Registre ocorrências</li>
+        </ul>
+    </section>
+
+    <section class="auth-form">
+        <h2>Criar conta</h2>
+        <p class="sub">Preencha os campos abaixo.</p>
+
+        <form method="POST" action="{{ url_for('auth.cadastro') }}">
+            <label for="nome">Nome completo</label>
+            <div class="campo-input">
+                {{ icone('usuario') }}
+                <input type="text" id="nome" name="nome" placeholder="Como podemos chamar você?"
+                       maxlength="100" value="{{ nome }}" autocomplete="name" required>
+            </div>
+
+            <label for="username">Nome de usuário</label>
+            <div class="campo-input">
+                {{ icone('usuario') }}
+                <input type="text" id="username" name="username" placeholder="Sem espaços, de 3 a 40 letras"
+                       minlength="3" maxlength="40" value="{{ username }}" autocomplete="username" required>
+            </div>
+
+            <label for="senha">Senha</label>
+            <div class="campo-input">
+                {{ icone('cadeado') }}
+                <input type="password" id="senha" name="senha" placeholder="No mínimo 6 caracteres"
+                       minlength="6" autocomplete="new-password" required>
+                <button type="button" class="btn-olho" data-alvo="senha" aria-label="Mostrar senha">{{ icone('olho') }}</button>
+            </div>
+            <div class="forca" id="forca">
+                <div class="forca-trilho"><div class="forca-barra" id="forca-barra"></div></div>
+                <small id="forca-texto">Use letras, números e símbolos para uma senha mais forte.</small>
+            </div>
+
+            <label for="confirmar_senha">Confirmar senha</label>
+            <div class="campo-input">
+                {{ icone('cadeado') }}
+                <input type="password" id="confirmar_senha" name="confirmar_senha"
+                       placeholder="Digite a senha de novo" minlength="6" autocomplete="new-password" required>
+                <button type="button" class="btn-olho" data-alvo="confirmar_senha" aria-label="Mostrar senha">{{ icone('olho') }}</button>
+            </div>
+            <small class="confere" id="confere"></small>
+
+            <button type="submit" class="btn btn-primary">Criar conta</button>
+        </form>
+
+        <p class="auth-troca">Já tem conta? <a href="{{ url_for('auth.login') }}">Entrar</a></p>
+    </section>
+</main>
+{% endblock %}

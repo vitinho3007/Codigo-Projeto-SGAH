@@ -1,0 +1,39 @@
+{# formulário de ocorrência: cadastro (item vazio) e edição #}
+{% from '_icones.html' import icone %}
+<form method="POST" action="{{ acao }}" class="form">
+    <label>Título da ocorrência
+        <input type="text" name="titulo" value="{{ item.titulo if item else '' }}"
+               placeholder="Ex.: Falta de água potável" maxlength="120" required>
+    </label>
+
+    <label>Localização
+        <input type="text" name="local" value="{{ item.local if item else '' }}"
+               placeholder="Cidade, bairro ou endereço" maxlength="150" required>
+    </label>
+
+    <div class="campo">
+        <span class="campo-rotulo">Prioridade</span>
+        <div class="pills">
+            {% for p in prioridades %}
+            <label class="pill pill-{{ p|lower|replace('í', 'i')|replace('é', 'e') }}">
+                <input type="radio" name="prioridade" value="{{ p }}"
+                       {% if item and item.prioridade == p %}checked{% endif %} required>
+                <span>{{ p }}</span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="campo">
+        <label for="descricao">Descrição</label>
+        <textarea id="descricao" name="descricao" rows="4" maxlength="500" data-contador="contador-descricao"
+                  placeholder="O que está acontecendo? Quantas pessoas são afetadas?" required>{{ item.descricao if item else '' }}</textarea>
+        <small class="dica contador" id="contador-descricao">0/500</small>
+    </div>
+
+    <div class="rodape-form">
+        {% if fechar %}<button type="button" class="btn btn-ghost" data-fechar>Cancelar</button>{% endif %}
+        {% if cancelar %}<a class="btn btn-ghost" href="{{ cancelar }}">Cancelar</a>{% endif %}
+        <button class="btn btn-primary" type="submit">{{ botao }}</button>
+    </div>
+</form>

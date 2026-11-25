@@ -1,0 +1,32 @@
+PROJETO FINAL - SPOLBP1 - Prof. Igor de Moraes
+
+Nome: João Victor Ferreira e Silva
+Prontuário: SP3200434
+
+1. RESUMO DO TRABALHO
+Título: SGAH - Sistema de Gestão e Logística de Ajuda Humanitária
+Tema: logística de ajuda humanitária em situações de emergência.
+
+Entidades gerenciadas (além do usuário):
+- Abrigos: nome, endereço, capacidade, responsável.
+- Suprimentos: nome, categoria, quantidade e abrigo (relacionamento opcional com Abrigos).
+- Operações/ocorrências: título, local, prioridade e descrição.
+
+Funcionalidades:
+- Cadastro, login e logout com senha em hash (werkzeug.security).
+- CRUD completo (cadastrar, listar, editar e excluir) das 3 entidades, sempre filtrando pelo usuario_id logado.
+- Busca e filtros (categoria, abrigo, prioridade).
+- Painel com indicadores do usuário.
+- Middleware @login_required validando o usuário no banco e guardando em g.usuario.
+- Sessão (session.clear, user_id e username), cookies (tema claro/escuro e último usuário),
+  flash messages categorizadas, erro 404/500 personalizados e logs com app.logger.
+
+Usuário de teste (criado pelo iniciar_bd.py):
+  usuário: admin
+  senha: 1234
+
+2. REPOSITÓRIO NO GITHUB
+https://github.com/vitinho3007/Codigo-Projeto-SGAH/blob/main/sgah%205.zip
+
+3. VÍDEO EXPLICATIVO (máx. 5 min)
+https://drive.google.com/file/d/1kwW1IeowaNS-SCQJJweC3v6sbRRHRwRN/view?usp=sharing

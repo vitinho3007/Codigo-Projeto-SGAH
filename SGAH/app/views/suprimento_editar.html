@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% from '_icones.html' import icone %}
+
+{% block titulo %}Editar suprimento{% endblock %}
+
+{% block content %}
+<div class="editar">
+    <nav class="migalhas">
+        <a href="{{ url_for('suprimentos.listar') }}">Suprimentos</a>
+        <span>/</span>
+        <strong>Editar</strong>
+    </nav>
+
+    <header class="page-head" style="margin-bottom:22px">
+        <div>
+            <p class="eyebrow">Controle de estoque</p>
+            <h1>{{ suprimento.nome }}</h1>
+            <p class="meta"><span>#{{ suprimento.id }}</span><span>{{ suprimento.abrigo_nome or 'Sem abrigo' }}</span>{% if suprimento.quantidade <= 30 %}<span class="tag-baixo" style="margin:0">Estoque baixo</span>{% endif %}</p>
+        </div>
+    </header>
+
+    <section class="card">
+        <div class="card-corpo">
+            {% with item=suprimento, acao=url_for('suprimentos.editar', id=suprimento.id), botao='Salvar alterações', cancelar=url_for('suprimentos.listar'), fechar=false %}
+                {% include '_form_suprimento.html' %}
+            {% endwith %}
+        </div>
+    </section>
+
+    <div class="perigo-linha">
+        <span>Não precisa mais deste registro?</span>
+        <form method="POST" action="{{ url_for('suprimentos.excluir', id=suprimento.id) }}"
+              onsubmit="return confirm('Excluir este suprimento?')">
+            <button type="submit" class="btn btn-perigo">{{ icone('lixeira') }} Excluir</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

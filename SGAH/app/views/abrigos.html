@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% from '_icones.html' import icone %}
+
+{% block titulo %}Abrigos{% endblock %}
+
+{% block content %}
+<header class="page-head">
+    <div>
+        <p class="eyebrow">Gestão de acolhimento</p>
+        <h1>Abrigos</h1>
+        <p class="lead">Locais de acolhimento, capacidade e quanto estoque cada um guarda.</p>
+    </div>
+    <button type="button" class="btn btn-primary" data-abrir-modal="modal-novo">{{ icone('mais') }} Novo abrigo</button>
+</header>
+
+<form method="GET" action="{{ url_for('abrigos.listar') }}" class="toolbar">
+    <div class="busca-campo">
+        {{ icone('busca') }}
+        <input type="text" name="busca" value="{{ busca }}" placeholder="Buscar por nome, endereço ou responsável">
+    </div>
+    {% if busca %}<a href="{{ url_for('abrigos.listar') }}" class="limpar">Limpar busca</a>{% endif %}
+</form>
+
+<section class="card">
+    {% if abrigos %}
+    <div class="tabela-area">
+        <table class="tabela">
+            <thead>
+                <tr><th>Abrigo</th><th>Responsável</th><th>Capacidade</th><th>Estoque</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for a in abrigos %}
+                <tr>
+                    <td>
+                        <span class="nome">{{ a.nome }}</span>
+                        <span class="sub">{{ a.endereco }}</span>
+                    </td>
+                    <td>{{ a.responsavel }}</td>
+                    <td class="num">{{ a.capacidade }} <span class="sub" style="display:inline">pessoas</span></td>
+                    <td class="num">{{ a.itens_estoque }} <span class="sub" style="display:inline">un.</span></td>
+                    <td>
+                        <div class="acoes">
+                            <a class="btn-icone" href="{{ url_for('abrigos.editar', id=a.id) }}" title="Editar" aria-label="Editar {{ a.nome }}">{{ icone('editar') }}</a>
+                            <form method="POST" action="{{ url_for('abrigos.excluir', id=a.id) }}"
+                                  onsubmit="return confirm('Excluir este abrigo?')">
+                                <button type="submit" class="btn-icone perigo" title="Excluir" aria-label="Excluir {{ a.nome }}">{{ icone('lixeira') }}</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="tabela-rodape">{{ abrigos|length }} abrigo{{ 's' if abrigos|length != 1 }}</p>
+    {% else %}
+    <div class="vazio">
+        <span class="vazio-icone">{{ icone('abrigos') }}</span>
+        {% if busca %}
+        <strong>Nada encontrado</strong>
+        <p>Nenhum abrigo bate com essa busca.</p>
+        {% else %}
+        <strong>Nenhum abrigo ainda</strong>
+        <p>Registre o primeiro local de acolhimento para ligar os suprimentos a ele.</p>
+        <button type="button" class="btn btn-primary" data-abrir-modal="modal-novo">{{ icone('mais') }} Novo abrigo</button>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+
+<dialog class="modal" id="modal-novo" {% if abrir_modal %}data-abrir{% endif %}>
+    <div class="modal-topo">
+        <div>
+            <h2>Novo abrigo</h2>
+            <p>Registre um local de acolhimento.</p>
+        </div>
+        <button type="button" class="btn-icone" data-fechar aria-label="Fechar">{{ icone('fechar') }}</button>
+    </div>
+    <div class="modal-corpo">
+        {% if erros %}
+        <ul class="erros">{% for e in erros %}<li>{{ e }}</li>{% endfor %}</ul>
+        {% endif %}
+        {% with item=(item if abrir_modal else none), acao=url_for('abrigos.cadastrar'), botao='Cadastrar abrigo', cancelar=none, fechar=true %}
+            {% include '_form_abrigo.html' %}
+        {% endwith %}
+    </div>
+</dialog>
+{% endblock %}

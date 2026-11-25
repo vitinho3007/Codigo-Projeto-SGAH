@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% from '_icones.html' import icone %}
+
+{% block titulo %}Editar abrigo{% endblock %}
+
+{% block content %}
+<div class="editar">
+    <nav class="migalhas">
+        <a href="{{ url_for('abrigos.listar') }}">Abrigos</a>
+        <span>/</span>
+        <strong>Editar</strong>
+    </nav>
+
+    <header class="page-head" style="margin-bottom:22px">
+        <div>
+            <p class="eyebrow">Gestão de acolhimento</p>
+            <h1>{{ abrigo.nome }}</h1>
+            <p class="meta"><span>#{{ abrigo.id }}</span><span>{{ abrigo.endereco }}</span></p>
+        </div>
+    </header>
+
+    <section class="card">
+        <div class="card-corpo">
+            {% with item=abrigo, acao=url_for('abrigos.editar', id=abrigo.id), botao='Salvar alterações', cancelar=url_for('abrigos.listar'), fechar=false %}
+                {% include '_form_abrigo.html' %}
+            {% endwith %}
+        </div>
+    </section>
+
+    <div class="perigo-linha">
+        <span>Não precisa mais deste registro?</span>
+        <form method="POST" action="{{ url_for('abrigos.excluir', id=abrigo.id) }}"
+              onsubmit="return confirm('Excluir este abrigo?')">
+            <button type="submit" class="btn btn-perigo">{{ icone('lixeira') }} Excluir</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

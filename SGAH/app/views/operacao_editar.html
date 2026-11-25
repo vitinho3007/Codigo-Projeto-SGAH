@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% from '_icones.html' import icone %}
+
+{% block titulo %}Editar ocorrência{% endblock %}
+
+{% block content %}
+<div class="editar">
+    <nav class="migalhas">
+        <a href="{{ url_for('operacoes.listar') }}">Operações</a>
+        <span>/</span>
+        <strong>Editar</strong>
+    </nav>
+
+    <header class="page-head" style="margin-bottom:22px">
+        <div>
+            <p class="eyebrow">Acompanhamento em campo</p>
+            <h1>{{ operacao.titulo }}</h1>
+            <p class="meta"><span>#{{ operacao.id }}</span><span>Registrada em {{ operacao.criado_em[:16] }}</span></p>
+        </div>
+    </header>
+
+    <section class="card">
+        <div class="card-corpo">
+            {% with item=operacao, acao=url_for('operacoes.editar', id=operacao.id), botao='Salvar alterações', cancelar=url_for('operacoes.listar'), fechar=false %}
+                {% include '_form_operacao.html' %}
+            {% endwith %}
+        </div>
+    </section>
+
+    <div class="perigo-linha">
+        <span>Não precisa mais deste registro?</span>
+        <form method="POST" action="{{ url_for('operacoes.excluir', id=operacao.id) }}"
+              onsubmit="return confirm('Excluir esta ocorrência?')">
+            <button type="submit" class="btn btn-perigo">{{ icone('lixeira') }} Excluir</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

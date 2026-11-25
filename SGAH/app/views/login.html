@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% from '_icones.html' import icone %}
+
+{% block titulo %}Entrar{% endblock %}
+
+{% block content %}
+<main class="auth">
+    <section class="auth-info">
+        <span class="marca-logo">{{ icone('cobertura') }}</span>
+        <h1>Ajuda humanitária, organizada.</h1>
+        <p>Suprimentos, abrigos e ocorrências em campo num só lugar, para decidir rápido quando importa.</p>
+        <ul class="auth-lista">
+            <li>{{ icone('suprimentos') }} Estoque sempre à vista</li>
+            <li>{{ icone('abrigos') }} Abrigos e capacidade</li>
+            <li>{{ icone('operacoes') }} Ocorrências por prioridade</li>
+        </ul>
+    </section>
+
+    <section class="auth-form">
+        <h2>Entrar</h2>
+        <p class="sub">Use seu usuário e senha para acessar o painel.</p>
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <label for="username">Usuário</label>
+            <div class="campo-input">
+                {{ icone('usuario') }}
+                <input type="text" id="username" name="username" placeholder="Seu usuário"
+                       value="{{ ultimo_usuario }}" autocomplete="username" required>
+            </div>
+
+            <label for="senha">Senha</label>
+            <div class="campo-input">
+                {{ icone('cadeado') }}
+                <input type="password" id="senha" name="senha" placeholder="Sua senha"
+                       autocomplete="current-password" required>
+                <button type="button" class="btn-olho" data-alvo="senha" aria-label="Mostrar senha">{{ icone('olho') }}</button>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Entrar</button>
+        </form>
+
+        <p class="auth-troca">Ainda não tem conta? <a href="{{ url_for('auth.cadastro') }}">Criar conta</a></p>
+    </section>
+</main>
+{% endblock %}

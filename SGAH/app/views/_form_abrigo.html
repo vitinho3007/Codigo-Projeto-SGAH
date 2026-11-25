@@ -1,0 +1,36 @@
+{# formulário de abrigo: cadastro (item vazio) e edição #}
+{% from '_icones.html' import icone %}
+<form method="POST" action="{{ acao }}" class="form">
+    <label>Nome do abrigo
+        <input type="text" name="nome" value="{{ item.nome if item else '' }}"
+               placeholder="Ex.: Escola Municipal Central" maxlength="100" required>
+    </label>
+
+    <label>Endereço
+        <input type="text" name="endereco" value="{{ item.endereco if item else '' }}"
+               placeholder="Rua, número, bairro" maxlength="200" required>
+    </label>
+
+    <div class="linha-2">
+        <div class="campo">
+            <label for="capacidade">Capacidade (pessoas)</label>
+            <div class="stepper">
+                <button type="button" data-passo="-10" aria-label="Diminuir 10">−</button>
+                <input type="number" id="capacidade" name="capacidade" min="1" step="1"
+                       value="{{ item.capacidade if item else '' }}" placeholder="0" required>
+                <button type="button" data-passo="10" aria-label="Aumentar 10">+</button>
+            </div>
+        </div>
+
+        <label>Responsável
+            <input type="text" name="responsavel" value="{{ item.responsavel if item else '' }}"
+                   placeholder="Nome do responsável" maxlength="100" required>
+        </label>
+    </div>
+
+    <div class="rodape-form">
+        {% if fechar %}<button type="button" class="btn btn-ghost" data-fechar>Cancelar</button>{% endif %}
+        {% if cancelar %}<a class="btn btn-ghost" href="{{ cancelar }}">Cancelar</a>{% endif %}
+        <button class="btn btn-primary" type="submit">{{ botao }}</button>
+    </div>
+</form>

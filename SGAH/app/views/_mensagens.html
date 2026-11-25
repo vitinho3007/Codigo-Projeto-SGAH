@@ -1,0 +1,13 @@
+{# avisos que aparecem no canto da tela e somem sozinhos #}
+{% with mensagens = get_flashed_messages(with_categories=true) %}
+    {% if mensagens %}
+    <div class="toasts" role="status">
+        {% for categoria, texto in mensagens %}
+        <div class="flash flash-{{ categoria }}">
+            {% if categoria == 'sucesso' %}{{ icone('ok') }}{% elif categoria == 'erro' %}{{ icone('alerta') }}{% else %}{{ icone('info') }}{% endif %}
+            <span>{{ texto }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endwith %}

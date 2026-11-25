@@ -1,0 +1,67 @@
+{% from '_icones.html' import icone %}
+{% set tema = 'dark' if request.cookies.get('tema') == 'dark' else 'claro' %}
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="{{ tema }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGAH | {% block titulo %}Ajuda Humanitária{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2320639b'/%3E%3Cpath d='M16 7l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8v-6z' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+</head>
+<body class="{% if not g.usuario %}publico{% endif %}">
+
+{% include '_mensagens.html' %}
+
+{% if g.usuario %}
+<div class="app">
+    <aside class="sidebar">
+        <a class="marca" href="{{ url_for('main.painel') }}">
+            <span class="marca-sgah">SGAH</span>
+            <span><strong>Ajuda Humanitária</strong><small>Gestão e logística</small></span>
+        </a>
+
+        <nav class="nav">
+            <p class="nav-titulo">Menu principal</p>
+            <a class="nav-item {% if request.endpoint == 'main.painel' %}ativo{% endif %}" href="{{ url_for('main.painel') }}">{{ icone('painel') }} Visão geral</a>
+            <a class="nav-item {% if request.blueprint == 'suprimentos' %}ativo{% endif %}" href="{{ url_for('suprimentos.listar') }}">{{ icone('suprimentos') }} Suprimentos</a>
+            <a class="nav-item {% if request.blueprint == 'abrigos' %}ativo{% endif %}" href="{{ url_for('abrigos.listar') }}">{{ icone('abrigos') }} Abrigos</a>
+            <a class="nav-item {% if request.blueprint == 'operacoes' %}ativo{% endif %}" href="{{ url_for('operacoes.listar') }}">{{ icone('operacoes') }} Operações</a>
+        </nav>
+
+        <div class="sidebar-fim">
+            <div class="usuario">
+                <span class="avatar">{{ g.usuario.nome[:1]|upper }}</span>
+                <span><strong>{{ g.usuario.nome }}</strong><small>@{{ g.usuario.username }}</small></span>
+            </div>
+            <div class="sidebar-botoes">
+                <form class="inline" method="POST" action="{{ url_for('main.tema') }}">
+                    <input type="hidden" name="escolha" value="{{ 'claro' if tema == 'dark' else 'dark' }}">
+                    <button type="submit" class="btn-lateral">{% if tema == 'dark' %}{{ icone('sol') }} Modo claro{% else %}{{ icone('lua') }} Modo escuro{% endif %}</button>
+                </form>
+                <form class="inline" method="POST" action="{{ url_for('auth.logout') }}">
+                    <button type="submit" class="btn-lateral">{{ icone('sair') }} Sair do sistema</button>
+                </form>
+            </div>
+        </div>
+    </aside>
+
+    <main class="conteudo">
+        <div class="miolo">
+{% endif %}
+
+{% block content %}{% endblock %}
+
+{% if g.usuario %}
+        </div>
+    </main>
+</div>
+{% else %}
+    <form class="tema-flutuante" method="POST" action="{{ url_for('main.tema') }}">
+        <input type="hidden" name="escolha" value="{{ 'claro' if tema == 'dark' else 'dark' }}">
+        <button type="submit" class="btn-icone" aria-label="Trocar tema">{% if tema == 'dark' %}{{ icone('sol') }}{% else %}{{ icone('lua') }}{% endif %}</button>
+    </form>
+{% endif %}
+</body>
+</html>
