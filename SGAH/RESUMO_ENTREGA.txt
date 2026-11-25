@@ -26,7 +26,7 @@ Usuário de teste (criado pelo iniciar_bd.py):
   senha: 1234
 
 2. REPOSITÓRIO NO GITHUB
-https://github.com/vitinho3007/Codigo-Projeto-SGAH/blob/main/sgah%205.zip
+https://github.com/vitinho3007/Codigo-Projeto-SGAH/tree/main
 
 3. VÍDEO EXPLICATIVO (máx. 5 min)
 https://drive.google.com/file/d/1kwW1IeowaNS-SCQJJweC3v6sbRRHRwRN/view?usp=sharing
